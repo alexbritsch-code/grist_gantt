@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://unpkg.com/frappe-gantt/dist/frappe-gantt.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
+  <style>
+    body { font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <svg id="gantt"></svg>
+
+  <script>
+    grist.ready();
+
+    grist.onRecords(function(records) {
+      let tasks = [];
+
+      records.forEach(r => {
+        if (!r["Date Entrée"] || !r["Date Sortie"] || !r["Espaces 61"]) return;
+
+        // Adapter le séparateur si nécessaire : "," ";" ou "\n"
+        const espaces = r["Espaces 61"].split(",").map(e => e.trim());
+
+        espaces.forEach(espace => {
+          tasks.push({
+            id: `${r.id}-${espace}`,
+            name: `${espace} – ${r.Projet}`,
+            start: r["Date Entrée"],
+            end: r["Date Sortie"]
+          });
+        });
+      });
+
+      new Gantt("#gantt", tasks, {
+        view_mode: "Month",
+        language: "fr",
+        bar_height: 24
+      });
+    });
+  </script>
+</body>
+</html>
