@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
   <style>
     body { font-family: sans-serif; }
+    /* Curseur pointer pour les barres cliquables */
+    .bar { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -25,18 +27,28 @@
             id: `${r.id}-${espace.id}`,
             name: `${espace.Nom} – ${r.Projet}`,
             start: r["Date Entrée"],
-            end: r["Date Sortie"]
+            end: r["Date Sortie"],
+            recordUrl: r._url  // <-- l’URL de la ligne projet
           });
         });
       });
 
-      new Gantt("#gantt", tasks, {
+      const gantt = new Gantt("#gantt", tasks, {
         view_mode: "Month",
         language: "fr",
-        bar_height: 24
+        bar_height: 24,
+        custom_popup_html: null  // désactive le popup par défaut
+      });
+
+      // Ajouter le clic pour ouvrir la fiche
+      gantt.tasks.forEach(task => {
+        task.$bar.addEventListener("click", () => {
+          if (task.task.recordUrl) {
+            window.open(task.task.recordUrl, "_blank");
+          }
+        });
       });
     });
   </script>
 </body>
 </html>
-
