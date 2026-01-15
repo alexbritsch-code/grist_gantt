@@ -1,1 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://unpkg.com/frappe-gantt/dist/frappe-gantt.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
+  <style>
+    body { font-family: sans-serif; }
+    .bar { cursor: pointer; }
+    /* Couleurs par espace */
+    .bar.espace-1 { fill: #1f77b4; }
+    .bar.espace-2 { fill: #ff7f0e; }
+    .bar.espace-3 { fill: #2ca02c; }
+    .bar.espace-4 { fill: #d62728; }
+    .bar.espace-5 { fill: #9467bd; }
+    /* Ajoute d'autres couleurs si nécessaire */
+  </style>
+</head>
+<body>
+  <svg id="gantt"></svg>
 
+  <script>
+    grist.ready();
+
+    grist.onRecords(function(records) {
+      let tasks = [];
+
+      // Création des tâches
+      records.forEach(r => {
+        if (!r["Date Entrée"] || !r["Date Sortie"] || !r["Espaces 61"]) return;
+
+        r["Espaces 61"].forEach(espace => {
+          tasks.push({
+            id: `${r.id}-${espace.id}`,
+            name: `${espace.Nom} – ${r.Projet}`,
+            start: r["Date Entrée"],
+            end: r["Date Sortie"],
+            recordUrl: r._url,
+            custom_class: `espace-${espace.id}`,
+            progress: 0,
+            project: r.Projet,
+            espaceName: espace.Nom,
+            dateEntree: r["Date Entrée"],
+            dateSortie: r["Date Sortie"]
+          });
+        });
+      });
+
+      const gantt = new Gantt("#gantt", tasks, {
+        view_mode: "Month",
+        language: "fr",
+        bar_height: 24,
+        custom_popup_html: function(task) {
+          return `
+            <div style="padding:5px;">
+              <strong>${task.task.espaceName} – ${task.task.project}</strong><br>
+              <em>Du :</em> ${task.task.dateEntree}<br>
+              <em>Au :</em> ${task.task.dateSortie}
+            </div>
+          `;
+        }
+      });
+
+      // Clic sur barre → ouvrir la fiche
+      gantt.tasks.forEach(task => {
+        task.$bar.addEventListener("click", () => {
+          if (task.task.recordUrl) {
+            window.open(task.task.recordUrl, "_blank");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
