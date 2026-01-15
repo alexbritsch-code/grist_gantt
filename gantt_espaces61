@@ -20,13 +20,10 @@
       records.forEach(r => {
         if (!r["Date Entrée"] || !r["Date Sortie"] || !r["Espaces 61"]) return;
 
-        // Adapter le séparateur si nécessaire : "," ";" ou "\n"
-        const espaces = r["Espaces 61"].split(",").map(e => e.trim());
-
-        espaces.forEach(espace => {
+        r["Espaces 61"].forEach(espace => {
           tasks.push({
-            id: `${r.id}-${espace}`,
-            name: `${espace} – ${r.Projet}`,
+            id: `${r.id}-${espace.id}`,
+            name: `${espace.Nom} – ${r.Projet}`,
             start: r["Date Entrée"],
             end: r["Date Sortie"]
           });
@@ -42,3 +39,4 @@
   </script>
 </body>
 </html>
+
