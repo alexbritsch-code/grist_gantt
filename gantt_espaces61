@@ -6,49 +6,10 @@
   <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
   <style>
     body { font-family: sans-serif; }
-    /* Curseur pointer pour les barres cliquables */
     .bar { cursor: pointer; }
-  </style>
-</head>
-<body>
-  <svg id="gantt"></svg>
+    /* Couleurs par espace */
+    .bar.espace-1 { fill: #1f77b4; }
+    .bar.espace-2 { fill: #ff7f0e; }
+    .bar.espace-3 { fill: #2ca02c; }
+    .bar.espace-4 {
 
-  <script>
-    grist.ready();
-
-    grist.onRecords(function(records) {
-      let tasks = [];
-
-      records.forEach(r => {
-        if (!r["Date Entrée"] || !r["Date Sortie"] || !r["Espaces 61"]) return;
-
-        r["Espaces 61"].forEach(espace => {
-          tasks.push({
-            id: `${r.id}-${espace.id}`,
-            name: `${espace.Nom} – ${r.Projet}`,
-            start: r["Date Entrée"],
-            end: r["Date Sortie"],
-            recordUrl: r._url  // <-- l’URL de la ligne projet
-          });
-        });
-      });
-
-      const gantt = new Gantt("#gantt", tasks, {
-        view_mode: "Month",
-        language: "fr",
-        bar_height: 24,
-        custom_popup_html: null  // désactive le popup par défaut
-      });
-
-      // Ajouter le clic pour ouvrir la fiche
-      gantt.tasks.forEach(task => {
-        task.$bar.addEventListener("click", () => {
-          if (task.task.recordUrl) {
-            window.open(task.task.recordUrl, "_blank");
-          }
-        });
-      });
-    });
-  </script>
-</body>
-</html>
